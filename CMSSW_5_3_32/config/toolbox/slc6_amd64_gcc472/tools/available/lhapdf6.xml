@@ -1,0 +1,10 @@
+<tool name="lhapdf6" version="6.1.5-epnlpl2">
+  <lib name="LHAPDF"/>
+  <client>
+    <environment name="LHAPDF6_BASE" default="/cvmfs/cms.cern.ch/slc6_amd64_gcc472/external/lhapdf6/6.1.5-epnlpl2"/>
+    <environment name="LIBDIR" default="$LHAPDF6_BASE/lib"/>
+    <environment name="INCLUDE" default="$LHAPDF6_BASE/include"/>
+  </client>
+  <runtime name="LHAPDF_DATA_PATH" value="$LHAPDF6_BASE/share/LHAPDF"/>
+  <use name="yaml-cpp"/>
+</tool>

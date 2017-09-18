@@ -1,0 +1,5 @@
+<tool name="boost_system" version="1.47.0-cms">
+  <info url="http://www.boost.org"/>
+  <lib name="boost_system"/>
+  <use name="boost"/>
+</tool>

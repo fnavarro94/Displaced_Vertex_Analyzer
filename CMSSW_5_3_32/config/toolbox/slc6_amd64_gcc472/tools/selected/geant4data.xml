@@ -1,0 +1,10 @@
+<tool name="geant4data" version="">
+  <client>
+    <environment name="GEANT4DATA_BASE" default="/cvmfs/cms.cern.ch/slc6_amd64_gcc472/external"/>
+  </client>
+  <runtime name="G4LEDATA" value="/cvmfs/cms.cern.ch/slc6_amd64_gcc472/external/geant4-G4EMLOW/6.23-cms/data/G4EMLOW6.23" type="path"/>
+  <runtime name="G4NEUTRONHPDATA" value="/cvmfs/cms.cern.ch/slc6_amd64_gcc472/external/geant4-G4NDL/3.14/data/G4NDL3.14" type="path"/>
+  <runtime name="G4NEUTRONXS" value="/cvmfs/cms.cern.ch/slc6_amd64_gcc472/external/geant4-G4NEUTRONXS/1.0/data/G4NEUTRONXS1.0" type="path"/>
+  <runtime name="G4LEVELGAMMADATA" value="/cvmfs/cms.cern.ch/slc6_amd64_gcc472/external/geant4-G4PhotonEvaporation/2.1/data/PhotonEvaporation2.1" type="path"/>
+  <runtime name="G4RADIOACTIVEDATA" value="/cvmfs/cms.cern.ch/slc6_amd64_gcc472/external/geant4-G4RadioactiveDecay/3.3/data/RadioactiveDecay3.3" type="path"/>
+</tool>

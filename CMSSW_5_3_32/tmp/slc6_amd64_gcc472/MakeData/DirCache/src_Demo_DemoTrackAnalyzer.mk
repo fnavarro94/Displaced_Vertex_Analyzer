@@ -1,0 +1,2 @@
+ALL_PACKAGES += Demo/DemoTrackAnalyzer
+subdirs_src_Demo_DemoTrackAnalyzer := src_Demo_DemoTrackAnalyzer_test src_Demo_DemoTrackAnalyzer_src src_Demo_DemoTrackAnalyzer_python
