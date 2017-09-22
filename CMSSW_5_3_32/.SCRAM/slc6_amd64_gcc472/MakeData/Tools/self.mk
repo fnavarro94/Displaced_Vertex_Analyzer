@@ -1,6 +1,6 @@
 ALL_TOOLS      += self
-self_EX_INCLUDE := /home/cms-opendata/Displaced_vertex/CMSSW_5_3_32/src /home/cms-opendata/Displaced_vertex/CMSSW_5_3_32/include/LCG /cvmfs/cms.cern.ch/slc6_amd64_gcc472/cms/cmssw/CMSSW_5_3_32/src /cvmfs/cms.cern.ch/slc6_amd64_gcc472/cms/cmssw/CMSSW_5_3_32/include/LCG
-self_EX_LIBDIR := /home/cms-opendata/Displaced_vertex/CMSSW_5_3_32/lib/slc6_amd64_gcc472 /home/cms-opendata/Displaced_vertex/CMSSW_5_3_32/external/slc6_amd64_gcc472/lib /cvmfs/cms.cern.ch/slc6_amd64_gcc472/cms/cmssw/CMSSW_5_3_32/lib/slc6_amd64_gcc472 /cvmfs/cms.cern.ch/slc6_amd64_gcc472/cms/cmssw/CMSSW_5_3_32/external/slc6_amd64_gcc472/lib
+self_EX_INCLUDE := /home/cms-opendata/Displaced_vertex_Analyzer/CMSSW_5_3_32/src /home/cms-opendata/Displaced_vertex_Analyzer/CMSSW_5_3_32/include/LCG /cvmfs/cms.cern.ch/slc6_amd64_gcc472/cms/cmssw/CMSSW_5_3_32/src /cvmfs/cms.cern.ch/slc6_amd64_gcc472/cms/cmssw/CMSSW_5_3_32/include/LCG
+self_EX_LIBDIR := /home/cms-opendata/Displaced_vertex_Analyzer/CMSSW_5_3_32/lib/slc6_amd64_gcc472 /home/cms-opendata/Displaced_vertex_Analyzer/CMSSW_5_3_32/external/slc6_amd64_gcc472/lib /cvmfs/cms.cern.ch/slc6_amd64_gcc472/cms/cmssw/CMSSW_5_3_32/lib/slc6_amd64_gcc472 /cvmfs/cms.cern.ch/slc6_amd64_gcc472/cms/cmssw/CMSSW_5_3_32/external/slc6_amd64_gcc472/lib
 self_EX_FLAGS_SYMLINK_DEPTH_CMSSW_SEARCH_PATH  := 2
 self_EX_FLAGS_LLVM_ANALYZER  := llvm-analyzer
 self_EX_FLAGS_SKIP_TOOLS_SYMLINK  := cxxcompiler ccompiler f77compiler gcc-cxxcompiler gcc-ccompiler gcc-f77compiler llvm-cxxcompiler llvm-ccompiler llvm-f77compiler llvm-analyzer-cxxcompiler llvm-analyzer-ccompiler icc-cxxcompiler icc-ccompiler icc-f77compiler x11 dpm

@@ -1,5 +1,5 @@
 ALL_PACKAGES += Demo/DemoTrackAnalyzer
-subdirs_src_Demo_DemoTrackAnalyzer := src_Demo_DemoTrackAnalyzer_test src_Demo_DemoTrackAnalyzer_src src_Demo_DemoTrackAnalyzer_python
+subdirs_src_Demo_DemoTrackAnalyzer := src_Demo_DemoTrackAnalyzer_python src_Demo_DemoTrackAnalyzer_test src_Demo_DemoTrackAnalyzer_src
 ALL_SUBSYSTEMS+=Demo
 subdirs_src_Demo = src_Demo_DemoTrackAnalyzer
 ALL_COMMONRULES += src_Demo_DemoTrackAnalyzer_test
