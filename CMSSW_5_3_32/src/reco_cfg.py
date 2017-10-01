@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.381.2.28 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/PyReleaseValidation/python/ConfigBuilder.py,v 
-# with command line options: -s RAW2DIGI,RECO --filein file:simu_test.root --fileout anOutputFileName.root --conditions START53_LV6::All --python_filename reco_cfg.py cmsDriver.py -s RAW2DIGI,RECO --filein file:simu_test.root --fileout anOutputFileName.root --conditions START53_LV6::All --python_filename reco_cfg.py --no_exec -n 20
+# with command line options: --filein file:simu_test.root --fileout file:reco_test.root --mc --eventcontent AODSIM --conditions START53_LV6::All --step RAW2DIGI,L1Reco,RECO --python_filename reco_cfg.py --no_exec -n 20 --datatier AODSIM
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('RECO')
@@ -16,12 +16,13 @@ process.load('SimGeneral.MixingModule.mixNoPU_cfi')
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
+process.load('Configuration.StandardSequences.L1Reco_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(20)
+    input = cms.untracked.int32(-1)
 )
 
 # Input source
@@ -37,20 +38,19 @@ process.options = cms.untracked.PSet(
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.381.2.28 $'),
-    annotation = cms.untracked.string('-s nevts:20'),
+    annotation = cms.untracked.string('--filein nevts:20'),
     name = cms.untracked.string('PyReleaseValidation')
 )
 
 # Output definition
 
-process.RECOSIMoutput = cms.OutputModule("PoolOutputModule",
-    splitLevel = cms.untracked.int32(0),
-    eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    outputCommands = process.RECOSIMEventContent.outputCommands,
-    fileName = cms.untracked.string('anOutputFileName.root'),
-    dataset = cms.untracked.PSet(SkipEvent = cms.untracked.vstring('ProductNotFound'),
+process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
+    eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
+    outputCommands = process.AODSIMEventContent.outputCommands,
+    fileName = cms.untracked.string('file:reco_test.root'),
+    dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
-        dataTier = cms.untracked.string('')
+        dataTier = cms.untracked.string('AODSIM')
     )
 )
 
@@ -63,13 +63,13 @@ process.RECOSIMoutput = cms.OutputModule("PoolOutputModule",
 
 process.GlobalTag.connect = cms.string('sqlite_file:/cvmfs/cms-opendata-conddb.cern.ch/START53_LV6A1.db')
 process.GlobalTag.globaltag = 'START53_LV6A1::All'
-
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
+process.L1Reco_step = cms.Path(process.L1Reco)
 process.reconstruction_step = cms.Path(process.reconstruction)
 process.endjob_step = cms.EndPath(process.endOfProcess)
-process.RECOSIMoutput_step = cms.EndPath(process.RECOSIMoutput)
+process.AODSIMoutput_step = cms.EndPath(process.AODSIMoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.raw2digi_step,process.reconstruction_step,process.endjob_step,process.RECOSIMoutput_step)
+process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.endjob_step,process.AODSIMoutput_step)
 

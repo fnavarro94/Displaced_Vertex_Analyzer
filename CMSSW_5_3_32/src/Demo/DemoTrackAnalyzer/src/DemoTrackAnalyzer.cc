@@ -20,8 +20,11 @@
 
 // system include files
 #include<vector>
+#include<TLorentzVector.h>
 #include<cmath>
 #include <memory>
+#include "vector"
+#include "algorithm"
 #include <TH1.h>
 #include <TFile.h>
 #include <TTree.h>
@@ -41,6 +44,9 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigData.h"
+#include "DataFormats/JetReco/interface/PFJet.h"
+#include "DataFormats/JetReco/interface/PFJetCollection.h"
+
 
 //ClassImp(Lepton)
 //
@@ -74,18 +80,26 @@ class DemoTrackAnalyzer : public edm::EDAnalyzer {
       virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
       TFile * file;
       TH1F * histo;
+      TH1F * passHist;
+      TH1F * allHist;
+      TH1F * divHist;
+      TH1F * jetMass;
       TTree * myTree;
+     // TCanvas * myCanvas;
      // Lepton * mylep;
-      struct tracks_ {float pt; float  eta;};
-      struct myStruct_ {std::vector<float> track_pt; std::vector<float> track_eta;
+      //struct tracks_ {float pt; float  eta;};
+      //struct myStruct_ {std::vector<float> track_pt; std::vector<float> track_eta;
                             // float pt; float eta;
                            
-                            };
-      myStruct_ leptons;
+                           // };
+      //myStruct_ leptons;
       std::vector<float> myVec;
-      myStruct_ all;
-      myStruct_ notLeptons; 
-      tracks_ dummyTrack;
+      std::vector<float>ptVec;
+      std::vector<int>index;
+      TLorentzVector v1, v2, v3, v4, vTot;
+      //myStruct_ all;
+      //myStruct_ notLeptons; 
+      //tracks_ dummyTrack;
       //TROOT * gROOT;
      // HLTConfigData CD;
       // ----------member data ---------------------------
@@ -158,7 +172,7 @@ edm::InputTag trigResultsTag("TriggerResults","","HLT"); //make sure have correc
 iEvent.getByLabel(trigResultsTag,trigResults);
 const edm::TriggerNames& trigNames = iEvent.triggerNames(*trigResults);   
 
-std::string pathName="HLT_DoublePhoton33_v2";
+std::string pathName="HLT_HT250_v12";
 //std::string pathName="HLT_Mu15_v2";
 bool passTrig=trigResults->accept(trigNames.triggerIndex(pathName));  
 std::cout << typeid(passTrig).name()<<std::endl;
@@ -166,7 +180,102 @@ std::cout<<(int)passTrig<<std::endl;
 
 
 myVec.clear();
-if (passTrig){  //si el evento activo al trigger
+
+edm::Handle<reco::PFJetCollection> pfjetH;
+iEvent.getByLabel("kt6PFJets", pfjetH);
+
+//passHist->Sumw2();
+//divHist->Sumw2();
+//allHist->Sumw2();
+ptVec.clear();
+index.clear();
+
+
+for ( reco::PFJetCollection::const_iterator jet = pfjetH->begin(); jet != pfjetH->end(); ++jet ) {
+                double pt = jet->pt();
+// std::cout<<pt<<std::endl;
+ allHist->Fill(pt);
+ ptVec.push_back(pt);
+ 
+ }
+
+*max_element(ptVec.rbegin(), ptVec.rend())=-1.0;
+*max_element(ptVec.rbegin(), ptVec.rend())=-1.0;
+*max_element(ptVec.rbegin(), ptVec.rend())=-1.0;
+*max_element(ptVec.rbegin(), ptVec.rend())=-1.0;
+
+
+
+
+for(int i = 0; i<(int) ptVec.size(); i++){
+if( ptVec[i] == -1.0){index.push_back(i);}
+std::cout<<"vec"<<index[i]<<std::endl;
+}
+
+
+
+int i = 0;
+
+for ( reco::PFJetCollection::const_iterator jet = pfjetH->begin(); jet != pfjetH->end(); ++jet ) {
+                double px= jet->px();
+                double py= jet->py();
+                double pz= jet->pz();
+     if (i == index[0]){
+        v1.SetE( jet->energy());
+        v1.SetPx(px);
+        v1.SetPy(py);
+        v1.SetPz(pz);
+        std::cout<<"v1"<<std::endl;
+                    }
+
+      if (i == index[1]){
+        v2.SetE(jet->energy());
+        v2.SetPx(px);
+        v2.SetPy(py);
+        v2.SetPz(pz);
+        std::cout<<"v2"<<std::endl;
+                    }
+
+      if (i == index[2]){
+        v3.SetE(jet->energy());
+        v3.SetPx(px);
+        v3.SetPy(py);
+        v3.SetPz(pz);
+       std::cout<<"v3"<<std::endl;
+                    }
+
+     if (i == index[3]){
+        v4.SetE(jet->energy());
+        v4.SetPx(px);
+        v4.SetPy(py);
+        v4.SetPz(pz);
+  std::cout<<"v4"<<std::endl; 
+                    }
+    
+    i++;            
+
+    }
+
+ vTot = v1 + v2 + v3 +v4;
+std::cout<<"la masa es: "<<vTot.M()<<std::endl;
+// jetMass->Fill(sqrt(vTot.M()));
+double mass = sqrt((vTot.E()*vTot.E())- (vTot.Px()*vTot.Px()) - (vTot.Py()*vTot.Py()) -(vTot.Pz()*vTot.Pz()));
+jetMass->Fill(mass);
+
+if (passTrig){ 
+
+	for ( reco::PFJetCollection::const_iterator jet = pfjetH->begin(); jet != pfjetH->end(); ++jet ) {
+    		double pt2 = jet->pt();
+// std::cout<<pt<<std::endl;
+passHist->Fill(pt2);
+divHist->Fill(pt2);
+}
+
+
+
+
+
+ //si el evento activo al trigger
 //Lepton *mylep  = new Lepton; 
     //  mylep->pt=1.0;
      // mylep->eta=5.0;
@@ -177,7 +286,7 @@ if (passTrig){  //si el evento activo al trigger
         // leptons.pt = 1.0;
         // leptons.eta = 2.0;
 
-	std::cout<<"true"<<std::endl;
+/*	std::cout<<"true"<<std::endl;
     const trigger::TriggerObjectCollection & trigObjColl(trigEvent->getObjects());
    
      for(TrackCollection::const_iterator itTrack = tracks->begin();
@@ -211,7 +320,7 @@ if (passTrig){  //si el evento activo al trigger
 
            
        }
-  
+ */
 }
 /*else if (! passTrig){std::cout<<"no paso"<<std::endl;}*/
  /*for(TrackCollection::const_iterator itTrack = tracks->begin();
@@ -223,7 +332,7 @@ if (passTrig){  //si el evento activo al trigger
 
 
 }*/
-myTree->Fill();
+//myTree->Fill();
 
 //edm::InputTag trigEventTag("hltTriggerSummaryAOD","","HLT"); //make sure have correct process on MC
 //data process=HLT, MC depends, Spring11 is REDIGI311X
@@ -266,10 +375,28 @@ DemoTrackAnalyzer::beginJob()
 //gROOT = new TROOT();
 //gROOT->ProcessLine(".L Lepton.cc+")
 file = new TFile("outfile.root","recreate");
-const bool oldAddDir = TH1::AddDirectoryStatus();
+//const bool oldAddDir = TH1::AddDirectoryStatus();
 TH1::AddDirectory(true);
-histo = new TH1F("pt","pt",1000,0,100);
-TH1::AddDirectory(oldAddDir);
+//histo = new TH1F("pt","pt",1000,0,100);
+passHist = new TH1F("passed","passed triger",15,0,100);
+//myCanvas = new TCanvas("myCanvas");
+//myCanvas->SetGrid();
+passHist->Sumw2();
+allHist = new TH1F("all","total",15,0,100);
+allHist->Sumw2();
+divHist = new TH1F("eff","",15,0,100);
+divHist->Sumw2();
+divHist->SetMarkerStyle(8);
+divHist->SetMarkerColor(2);
+divHist->SetMarkerSize(2);
+divHist->SetXTitle("Jet Pt (GeV)");
+divHist->SetYTitle("Efficiency");
+jetMass = new TH1F("mass","",100,0,1000);
+jetMass->SetXTitle("Mass (GeV)");
+jetMass->SetYTitle("Number of events");
+
+
+//TH1::AddDirectory(oldAddDir);
 myTree = new TTree("Events", "Event Tree");
 //mylep  = new Lepton();
 //myTree->Branch("leptons",&myVec, "Pt/std::vector<float>:eta"); 
@@ -281,6 +408,7 @@ myTree->Branch("leptons",&myVec);
 void 
 DemoTrackAnalyzer::endJob() 
 {
+ divHist->Divide(allHist);
 file->Write();
 file->Close();
 }

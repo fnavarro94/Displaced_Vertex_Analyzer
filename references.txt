@@ -1,0 +1,8 @@
+Paper: https://cms-physics.web.cern.ch/cms-physics/public/EXO-11-101-pas.pdf
+
+Analysis notes: http://cms.cern.ch/iCMS/jsp/openfile.jsp?tp=draft&files=AN2011_486_v20.pdf
+
+
+
+Trigger analysis: http://cms.cern.ch/iCMS/jsp/openfile.jsp?tp=draft&files=AN2011_112_v2.pdf
+

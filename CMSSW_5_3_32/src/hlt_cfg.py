@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.381.2.28 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/PyReleaseValidation/python/ConfigBuilder.py,v 
-# with command line options: Pythia_H0_pyupda_8TeV_cfi.py --step=GEN,SIM,DIGI,L1,DIGI2RAW,HLT:2011 --conditions=START53_LV6A1::All --fileout=simu_test.root --python_filename hlt_cfg.py --number=20 --mc --no_exec
+# with command line options: Pythia_H0_pyupda_8TeV_cfi.py --step=GEN,SIM,DIGI,L1,DIGI2RAW,HLT:2011 --datatier GEN-SIM --conditions=START53_LV6A1::All --fileout=simu_test.root --eventcontent RAWSIM --python_filename hlt_cfg.py --number=5 --mc --no_exec
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('HLT')
@@ -28,7 +28,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(20)
+    input = cms.untracked.int32(500)
 )
 
 # Input source
@@ -41,20 +41,20 @@ process.options = cms.untracked.PSet(
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.381.2.28 $'),
-    annotation = cms.untracked.string('Pythia_H0_pyupda_8TeV_cfi.py nevts:20'),
+    annotation = cms.untracked.string('Pythia_H0_pyupda_8TeV_cfi.py nevts:5'),
     name = cms.untracked.string('PyReleaseValidation')
 )
 
 # Output definition
 
-process.RECOSIMoutput = cms.OutputModule("PoolOutputModule",
+process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    outputCommands = process.RECOSIMEventContent.outputCommands,
+    outputCommands = process.RAWSIMEventContent.outputCommands,
     fileName = cms.untracked.string('simu_test.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
-        dataTier = cms.untracked.string('')
+        dataTier = cms.untracked.string('GEN-SIM')
     ),
     SelectEvents = cms.untracked.PSet(
         SelectEvents = cms.vstring('generation_step')
@@ -68,9 +68,9 @@ process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 #from Configuration.AlCa.GlobalTag import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'START53_LV6A1::All', '')
 
+
 process.GlobalTag.connect = cms.string('sqlite_file:/cvmfs/cms-opendata-conddb.cern.ch/START53_LV6A1.db')
 process.GlobalTag.globaltag = 'START53_LV6A1::All'
-
 
 process.generator = cms.EDFilter("Pythia6GeneratorFilter",
     UseExternalGenerators = cms.untracked.bool(False),
@@ -121,12 +121,12 @@ process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.digi2raw_step = cms.Path(process.DigiToRaw)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.endjob_step = cms.EndPath(process.endOfProcess)
-process.RECOSIMoutput_step = cms.EndPath(process.RECOSIMoutput)
+process.RAWSIMoutput_step = cms.EndPath(process.RAWSIMoutput)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.simulation_step,process.digitisation_step,process.L1simulation_step,process.digi2raw_step)
 process.schedule.extend(process.HLTSchedule)
-process.schedule.extend([process.endjob_step,process.RECOSIMoutput_step])
+process.schedule.extend([process.endjob_step,process.RAWSIMoutput_step])
 # filter all path with the production filter sequence
 for path in process.paths:
 	getattr(process,path)._seq = process.generator * getattr(process,path)._seq 
