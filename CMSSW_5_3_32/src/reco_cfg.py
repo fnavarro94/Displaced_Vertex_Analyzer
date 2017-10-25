@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.381.2.28 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/PyReleaseValidation/python/ConfigBuilder.py,v 
-# with command line options: --filein file:simu_test.root --fileout file:reco_test.root --mc --eventcontent AODSIM --conditions START53_LV6::All --step RAW2DIGI,L1Reco,RECO --python_filename reco_cfg.py --no_exec -n 20 --datatier AODSIM
+# with command line options: --filein file:simu_test.root --fileout file:reco_test.root --mc --eventcontent AODSIM --conditions START53_LV6::All --step RAW2DIGI,L1Reco,RECO --python_filename reco_cfg.py --no_exec -n 10 --datatier AODSIM
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('RECO')
@@ -22,7 +22,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(100)
 )
 
 # Input source
@@ -38,7 +38,7 @@ process.options = cms.untracked.PSet(
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.381.2.28 $'),
-    annotation = cms.untracked.string('--filein nevts:20'),
+    annotation = cms.untracked.string('--filein nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
 
@@ -60,9 +60,10 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
 #from Configuration.AlCa.GlobalTag import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'START53_LV6::All', '')
 
-
 process.GlobalTag.connect = cms.string('sqlite_file:/cvmfs/cms-opendata-conddb.cern.ch/START53_LV6A1.db')
 process.GlobalTag.globaltag = 'START53_LV6A1::All'
+
+
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.L1Reco_step = cms.Path(process.L1Reco)

@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.381.2.28 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/PyReleaseValidation/python/ConfigBuilder.py,v 
-# with command line options: Pythia_H0_pyupda_7TeV_cfi.py --step=GEN,SIM,DIGI,L1,DIGI2RAW,HLT:2011 --datatier GEN-SIM --conditions=START53_LV6A1::All --fileout=simu_test.root --eventcontent RAWSIM --python_filename hlt_cfg.py --number=10 --mc --no_exec
+# with command line options: Pythia_H0_pyupda_7TeV_cfi.py --step=GEN,SIM,DIGI,L1,DIGI2RAW,HLT:2011 --datatier GEN-SIM --conditions=START53_LV6A1::All --fileout=simu_test.root --pileup_input file:minibias.root --eventcontent RAWSIM --python_filename hltTest_cfg.py --number=10 --pileup 2011_FinalDist_OOTPU --mc --no_exec
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('HLT')
@@ -12,7 +12,7 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
-process.load('SimGeneral.MixingModule.mixNoPU_cfi')
+process.load('SimGeneral.MixingModule.mix_2011_FinalDist_OOTPU_cfi')
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.GeometrySimDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -28,7 +28,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(5)
 )
 
 # Input source
@@ -64,17 +64,14 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
 # Additional output definition
 
 # Other statements
+process.mix.input.fileNames = cms.untracked.vstring(['file:minbias.root'])
+#process.mix.input.fileNames = cms.untracked.vstring(['root://eospublic.cern.ch//eos/opendata/cms/Run2011A/MinimumBias/AOD/12Oct2013-v1/00000/02054981-A445-E311-B8D5-002590494DE8.root'])
 process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 #from Configuration.AlCa.GlobalTag import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'START53_LV6A1::All', '')
 
-
-
-
-
 process.GlobalTag.connect = cms.string('sqlite_file:/cvmfs/cms-opendata-conddb.cern.ch/START53_LV6A1.db')
 process.GlobalTag.globaltag = 'START53_LV6A1::All'
-
 
 process.generator = cms.EDFilter("Pythia6GeneratorFilter",
     UseExternalGenerators = cms.untracked.bool(False),

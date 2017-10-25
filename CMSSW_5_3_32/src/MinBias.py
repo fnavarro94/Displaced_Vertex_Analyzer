@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.381.2.28 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/PyReleaseValidation/python/ConfigBuilder.py,v 
-# with command line options: Pythia_H0_pyupda_7TeV_cfi.py --step=GEN,SIM,DIGI,L1,DIGI2RAW,HLT:2011 --datatier GEN-SIM --conditions=START53_LV6A1::All --fileout=simu_test.root --eventcontent RAWSIM --python_filename hlt_cfg.py --number=10 --mc --no_exec
+# with command line options: MinBias_7TeV_cfi --conditions auto:startup -s GEN,SIM,DIGI,L1,DIGI2RAW,HLT:2011 --datatier GEN-SIM -n 100 --relval 9000,300 --eventcontent RAWSIM --io MinBias.io --python MinBias.py --no_exec --fileout minbias.root
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('HLT')
@@ -41,7 +41,7 @@ process.options = cms.untracked.PSet(
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.381.2.28 $'),
-    annotation = cms.untracked.string('Pythia_H0_pyupda_7TeV_cfi.py nevts:10'),
+    annotation = cms.untracked.string('MinBias_7TeV_cfi nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
 
@@ -51,7 +51,7 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = process.RAWSIMEventContent.outputCommands,
-    fileName = cms.untracked.string('simu_test.root'),
+    fileName = cms.untracked.string('minbias.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('GEN-SIM')
@@ -66,23 +66,18 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
 # Other statements
 process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 #from Configuration.AlCa.GlobalTag import GlobalTag
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'START53_LV6A1::All', '')
-
-
-
-
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:startup', '')
 
 process.GlobalTag.connect = cms.string('sqlite_file:/cvmfs/cms-opendata-conddb.cern.ch/START53_LV6A1.db')
 process.GlobalTag.globaltag = 'START53_LV6A1::All'
 
 
 process.generator = cms.EDFilter("Pythia6GeneratorFilter",
-    UseExternalGenerators = cms.untracked.bool(False),
-    pythiaPylistVerbosity = cms.untracked.int32(3),
+    pythiaPylistVerbosity = cms.untracked.int32(0),
     filterEfficiency = cms.untracked.double(1.0),
-    pythiaHepMCVerbosity = cms.untracked.bool(True),
+    pythiaHepMCVerbosity = cms.untracked.bool(False),
     comEnergy = cms.double(7000.0),
-    maxEventsToPrint = cms.untracked.int32(10),
+    maxEventsToPrint = cms.untracked.int32(0),
     PythiaParameters = cms.PSet(
         pythiaUESettings = cms.vstring('MSTJ(11)=3     ! Choice of the fragmentation function', 
             'MSTJ(22)=2     ! Decay those unstable particles', 
@@ -107,14 +102,19 @@ process.generator = cms.EDFilter("Pythia6GeneratorFilter",
             'MSTP(91)=1      !', 
             'PARP(91)=2.1   ! kt distribution', 
             'PARP(93)=15.0  ! '),
+        processParameters = cms.vstring('MSEL=0         ! User defined processes', 
+            'MSUB(11)=1     ! Min bias process', 
+            'MSUB(12)=1     ! Min bias process', 
+            'MSUB(13)=1     ! Min bias process', 
+            'MSUB(28)=1     ! Min bias process', 
+            'MSUB(53)=1     ! Min bias process', 
+            'MSUB(68)=1     ! Min bias process', 
+            'MSUB(92)=1     ! Min bias process, single diffractive', 
+            'MSUB(93)=1     ! Min bias process, single diffractive', 
+            'MSUB(94)=1     ! Min bias process, double diffractive', 
+            'MSUB(95)=1     ! Min bias process'),
         parameterSets = cms.vstring('pythiaUESettings', 
-            'pythiaMyParameters', 
-            'PYUPDAParameters'),
-        PYUPDAParameters = cms.vstring("PYUPDAFILE = \'Configuration/Generator/data/Pythia_H0_pyupda.in\'"),
-        pythiaMyParameters = cms.vstring('MSTJ(22)=1    ! Decay ALL unstable particles', 
-            'MSEL=0', 
-            'MSUB(152)=1', 
-            'MWID(35)=2 ! Let me set H0 properties')
+            'processParameters')
     )
 )
 
