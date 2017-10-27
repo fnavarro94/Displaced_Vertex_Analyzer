@@ -81,9 +81,14 @@ class DemoTrackAnalyzer : public edm::EDAnalyzer {
       TFile * file;
       TH1F * histo;
       TH1F * passHist;
+      TH1F * muMass_hist;
+      TH1F * top2Mass_hist;
+      TH1F * eMass_hist;
       TH1F * allHist;
       TH1F * divHist;
       TH1F * jetMass;
+      TH1F * jetPt;
+      TH1F * jetPt_trig;
       TTree * myTree;
      // TCanvas * myCanvas;
      // Lepton * mylep;
@@ -96,7 +101,7 @@ class DemoTrackAnalyzer : public edm::EDAnalyzer {
       std::vector<float> myVec;
       std::vector<float>ptVec;
       std::vector<int>index;
-      TLorentzVector v1, v2, v3, v4, vTot;
+      TLorentzVector v1, v2, v3, v4, vTot, ve, vmu, top2;
       //myStruct_ all;
       //myStruct_ notLeptons; 
       //tracks_ dummyTrack;
@@ -172,13 +177,36 @@ edm::InputTag trigResultsTag("TriggerResults","","HLT"); //make sure have correc
 iEvent.getByLabel(trigResultsTag,trigResults);
 const edm::TriggerNames& trigNames = iEvent.triggerNames(*trigResults);   
 
-std::string pathName="HLT_HT250_v12";
-//std::string pathName="HLT_Mu15_v2";
+//std::string pathName="HLT_HT250_v8";  // simu  v12,  electrones-> v2, muones-> v8
+std::string pathName= "HLT_HT250_DoubleDisplacedJet60_v1"; // electrones
+//std::string pathName= "HLT_HT250_DoubleDisplacedJet60_v7";// Muones
+
+
+
+//std::string pathName_e="HLT_DoublePhoton43_HEVT_v2"; // simu
+std::string pathName_e="HLT_DoublePhoton33_v2"; // electrones
+//std::string pathName_e="HLT_DoublePhoton33_HEVT_v3";//muon electron
+//std::string pathName_e="HLT_DoublePhoton38_HEVT_v2";// muon electron
+
+
+//std::string pathName_mu="HLT_L2DoubleMu23_NoVertex_v9"; //simu
+std::string pathName_mu="HLT_L2DoubleMu23_NoVertex_v1"; // electrones
+//std::string pathName_mu="HLT_L2DoubleMu23_NoVertex_v7"; // muon, electron
+
+
+
+
 bool passTrig=trigResults->accept(trigNames.triggerIndex(pathName));  
-std::cout << typeid(passTrig).name()<<std::endl;
-std::cout<<(int)passTrig<<std::endl;
+
+bool passTrig_e = trigResults->accept(trigNames.triggerIndex(pathName_e));
+ 
+bool passTrig_mu = trigResults->accept(trigNames.triggerIndex(pathName_mu));
 
 
+
+
+ 
+ 
 myVec.clear();
 
 edm::Handle<reco::PFJetCollection> pfjetH;
@@ -197,7 +225,17 @@ for ( reco::PFJetCollection::const_iterator jet = pfjetH->begin(); jet != pfjetH
  allHist->Fill(pt);
  ptVec.push_back(pt);
  
+jetPt->Fill(pt); 
+
+if (passTrig){
+jetPt_trig->Fill(pt);
+
+}
+
  }
+
+
+
 
 *max_element(ptVec.rbegin(), ptVec.rend())=-1.0;
 *max_element(ptVec.rbegin(), ptVec.rend())=-1.0;
@@ -270,6 +308,29 @@ if (passTrig){
 passHist->Fill(pt2);
 divHist->Fill(pt2);
 }
+}
+
+if(passTrig_e){
+ 
+ ve = v1 +v2;
+  eMass_hist->Fill(ve.M());
+}
+
+if(passTrig_mu){
+
+vmu = v1+v2;
+muMass_hist->Fill(vmu.M());
+
+
+} // /*
+
+top2 = v1+v2;
+
+top2Mass_hist->Fill(top2.M());
+
+
+
+
 
 
 
@@ -321,7 +382,7 @@ divHist->Fill(pt2);
            
        }
  */
-}
+   //}                 *descomentar
 /*else if (! passTrig){std::cout<<"no paso"<<std::endl;}*/
  /*for(TrackCollection::const_iterator itTrack = tracks->begin();
        itTrack != tracks->end();
@@ -379,6 +440,10 @@ file = new TFile("outfile.root","recreate");
 TH1::AddDirectory(true);
 //histo = new TH1F("pt","pt",1000,0,100);
 passHist = new TH1F("passed","passed triger",15,0,100);
+
+muMass_hist = new TH1F("muon M","Muon mass",50,0,1000);
+eMass_hist = new TH1F("electron M", "electron mass",50,0,1000);
+top2Mass_hist = new TH1F("top2M","top two jets mass",200,0,1000);
 //myCanvas = new TCanvas("myCanvas");
 //myCanvas->SetGrid();
 passHist->Sumw2();
@@ -392,10 +457,10 @@ divHist->SetMarkerSize(2);
 divHist->SetXTitle("Jet Pt (GeV)");
 divHist->SetYTitle("Efficiency");
 jetMass = new TH1F("mass","",100,0,1000);
-jetMass->SetXTitle("Mass (GeV)");
+jetMass->SetXTitle("MASS (GeV)");
 jetMass->SetYTitle("Number of events");
-
-
+jetPt = new TH1F("jet_pt", "",100,0,500);
+jetPt_trig = new TH1F("jet_pt_trig", "", 100,0,500);
 //TH1::AddDirectory(oldAddDir);
 myTree = new TTree("Events", "Event Tree");
 //mylep  = new Lepton();
