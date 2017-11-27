@@ -51,7 +51,7 @@
 
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
-
+#include "DataFormats/TrackReco/interface/Track.h"
 
 //ClassImp(Lepton)
 //
@@ -195,42 +195,139 @@ iEvent.getByLabel( "offlinePrimaryVertices",vertHand);
  * If an event contains 10 or more tracks, at leas 25% of them must be "hight purity"
  */
  int countVert = 0;
+ int countTrack = 0;
  std::cout<<"Nueva vuelta"<<std::endl<<std::endl;
  for(reco::VertexCollection::const_iterator itVert = vertHand->begin();
        itVert != vertHand->end();
        ++itVert){
-		
+		countTrack = 0;
 		double x,y,r;
 		x = itVert->x();
 		y = itVert->y();
 		r = sqrt(x*x + y*y);   
 		
-         std::cout<<"Vertice "<< countVert++<<" "<<r<<" con"<<itVert->tracksSize()<<" tracks"<<std::endl;		
+         std::cout<<"Vertice "<< countVert++<<" "<<r<<" con "<<itVert->tracksSize()<<" tracks. Es valido? "<<itVert->isValid()<<std::endl;		
          
-         
+          
+          std::cout<<countTrack<<std::endl;
+          
          int count2 = 0;
          
         for(reco::Vertex::trackRef_iterator itTrack = itVert->tracks_begin();
        itTrack != itVert->tracks_end();
        ++itTrack){ count2++;
-		   std::cout<<itTrack[0]->outerPt()<<std::endl;
-		  
+		   
+		   //std::cout<<typeid(itTrack).name()<<std::endl;
+		      //std::cout<<itTrack->theta()<<std::endl;
 		   
 		     }
             
 		   }  
    
+// const trigger::TriggerObjectCollection & e_trigObjColl(trigEvent->getObjects()); 
  
 /**************************************************************************Electron Identification Cuts*/
+//Tracks with the following characteristics are looked for:
+// high purity
+// pt>41
+// at leas 6 hits of wich at least 2 are 3D
+// eta < 2
+// transverse impact parameter significance > 3
+std::string e_filterName("hltHT250"); 
+//std::string filterName("hltL2DoubleMu23NoVertexL2PreFiltered"); 
+
+
+double d0, sigma, tips;
+ int electron_candidates = 0;
+//it is important to specify the right HLT process for the filter, not doing this is a common bug
+trigger::size_type e_filterIndex = trigEvent->filterIndex(edm::InputTag(e_filterName,"",trigEventTag.process())); 
+if(e_filterIndex<trigEvent->sizeFilters()){ 
+    const trigger::Keys& trigKeys = trigEvent->filterKeys(e_filterIndex); 
+    const trigger::TriggerObjectCollection & e_trigObjColl(trigEvent->getObjects());
 
 
 
- 
+
+
+for(TrackCollection::const_iterator itTrack = tracks->begin();
+       itTrack != tracks->end();
+       ++itTrack){ 
+		    d0 = itTrack->dxy();
+		    sigma = itTrack->dxyError();
+		    tips = d0/sigma;
+		   if (itTrack->quality((reco::TrackBase::TrackQuality)2) && itTrack->pt() > 41 && itTrack->found() > 6 && itTrack->eta()<2 && tips >3){
+			   
+		
+			   
+			      //now loop of the trigger objects passing filter
+                for(trigger::Keys::const_iterator keyIt=trigKeys.begin();keyIt!=trigKeys.end();++keyIt){ 
+                const trigger::TriggerObject& obj = e_trigObjColl[*keyIt];
+			       
+			             double dEta2 =pow( itTrack->eta()-obj.eta(),2); 
+						 double dPhi2 =pow( itTrack->phi()-obj.phi(),2);
+						 double dR = sqrt(dPhi2+dEta2);
+						  if(dR<0.1){electron_candidates++;}
+		            }
+			   
+			     }
+			   }  //falta numero de 3d hitts
+		    
+		     
+
+   
+}
+ std::cout<<" Electron candidates " <<electron_candidates<<std::endl;
 /**************************************************************************Muon Identification Cuts*/
+ //Tracks with the following characteristics are looked for:
+// high purity
+// pt > 33
+// at leas 6 hits of wich at least 2 are 3D
+// eta < 2
+// transverse impact parameter significance > 2
+
+ int muon_candidates = 0;
+
+std::string m_filterName("hltHT250"); 
+//std::string filterName("hltL2DoubleMu23NoVertexL2PreFiltered"); 
+
+
+
+//it is important to specify the right HLT process for the filter, not doing this is a common bug
+trigger::size_type m_filterIndex = trigEvent->filterIndex(edm::InputTag(m_filterName,"",trigEventTag.process())); 
+if(m_filterIndex<trigEvent->sizeFilters()){ 
+    const trigger::Keys& trigKeys = trigEvent->filterKeys(m_filterIndex); 
+    const trigger::TriggerObjectCollection & m_trigObjColl(trigEvent->getObjects());
+    
+
  
+
  
- 
- 
+ for(TrackCollection::const_iterator itTrack = tracks->begin();
+       itTrack != tracks->end();
+       ++itTrack){ 
+		    d0 = itTrack->dxy();
+		    sigma = itTrack->dxyError();
+		    tips = d0/sigma;
+		   if (itTrack->quality((reco::TrackBase::TrackQuality)2) && itTrack->pt() > 33 && itTrack->found() > 6 && itTrack->eta()<2 && tips >2){
+			   
+			   
+			   std::cout<<"Charge: "<<itTrack->charge()<<std::endl;
+	            //now loop of the trigger objects passing filter
+                for(trigger::Keys::const_iterator keyIt=trigKeys.begin();keyIt!=trigKeys.end();++keyIt){ 
+                const trigger::TriggerObject& obj = m_trigObjColl[*keyIt];
+			       
+			             double dEta2 =pow( itTrack->eta()-obj.eta(),2); 
+						 double dPhi2 =pow( itTrack->phi()-obj.phi(),2);
+						 double dR = sqrt(dPhi2+dEta2);
+						  if(dR<0.1){muon_candidates++;}
+		            }
+			   
+			   }  //falta numero de 3d hitts
+		    
+		     }
+		     
+		 }
+		 std::cout<<" Muon candidates " <<muon_candidates<<std::endl;
 /************************************************************************** X canditate formation*/
  
  
